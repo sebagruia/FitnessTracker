@@ -8,12 +8,12 @@ const entries = (state=initialState, action)=>{
         case RECEIVE_ENTRIES:
             return {
                 ...state,
-                ...action.payload
+                ...action.entries
             }
         case ADD_ENTRY:
             return {
                 ...state,
-                ...action.payload
+                ...action.entry
             }
         default:
             return state;

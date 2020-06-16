@@ -3,12 +3,12 @@ export const ADD_ENTRY = "ADD_ENTRY";
 
 const receiveEntries  = (entries)=>({
     type:RECEIVE_ENTRIES,
-    payload:entries
+    entries
 })
 
 const addEntry = (entry) =>({
     type:ADD_ENTRY,
-    payload:entry
+    entry
 })
 
 export {receiveEntries, addEntry};

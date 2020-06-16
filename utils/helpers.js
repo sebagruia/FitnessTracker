@@ -56,9 +56,9 @@ export const getMetricMetaInfo = (metric) => {
     run: {
       id:1,
       displayName: "Run",
-      max: 100000,
-      unit: "meters",
-      step: 100,
+      max: 150,
+      unit: "Km",
+      step: 1,
       type: "steppers",
       getIcon() {
         return (
@@ -71,9 +71,9 @@ export const getMetricMetaInfo = (metric) => {
     bike: {
       id:2,
       displayName: "Bike",
-      max: 200000,
-      unit: "meters",
-      step: 100,
+      max: 500,
+      unit: "km",
+      step: 1,
       type: "steppers",
       getIcon() {
         return (
@@ -138,7 +138,7 @@ export const getMetricMetaInfo = (metric) => {
 
 export function getDailyReminderValue (){
   return{
-    today:"&#128079; Don't forget to log your data today!"
+    today:"👋 Don't forget to log your data today!"
   }
 
 }

@@ -34,14 +34,12 @@ class AddEntry extends Component {
   increment = (metric) => {
     const { max, step } = getMetricMetaInfo(metric);
     const count = this.state[metric] + step;
-
     this.setState({ ...this.state, [metric]: count > max ? max : count });
   };
 
   decrement = (metric) => {
     const { step } = getMetricMetaInfo(metric);
     const count = this.state[metric] - step;
-
     this.setState({ ...this.state, [metric]: count < 0 ? 0 : count });
   };
 
@@ -52,15 +50,13 @@ class AddEntry extends Component {
   submit = () => {
     const key = timeToString();
     const entry = this.state;
-    console.log(key);
-    console.log(entry);
 
     this.props.dispatch(addEntry({
       [key]:entry
     }));
 
     this.setState({
-      run: 0,
+      run:  0,
       bike: 0,
       swim: 0,
       sleep: 0,
@@ -88,7 +84,6 @@ class AddEntry extends Component {
 
   render() {
     const {alreadyLogged} = this.props;
-    console.log(alreadyLogged);
     const metaInfo = getMetricMetaInfo();
     const newDate = new Date().toLocaleDateString("en-GB");
 
@@ -145,12 +140,9 @@ class AddEntry extends Component {
 }
 
 const mapStateToProps = (state)=>{
-  console.log(state);
   const key = timeToString();
-  console.log(key)
-  console.log(state[key])
   return {
-    alreadyLogged: state.entries[key] && typeof state.entries[key].today === "undefined"
+    alreadyLogged: state.entries[key] && typeof state.entries[key].today === "undefined",
   }
 }
 
