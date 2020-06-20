@@ -1,11 +1,15 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, AsyncStorage } from "react-native";
 import {
   FontAwesome,
   MaterialIcons,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
+import * as Permissions from "expo-permissions";
+import { Notifications } from "expo";
 import { white, red, orange, blue, lightPurp, pink } from "./colors";
+
+const NOTIFICATION_KEY = "FitnessTracker:notification";
 
 export function isBetween(num, x, y) {
   if (num >= x && num <= y) {
@@ -54,7 +58,7 @@ export function timeToString(time = Date.now()) {
 export const getMetricMetaInfo = (metric) => {
   const info = {
     run: {
-      id:1,
+      id: 1,
       displayName: "Run",
       max: 150,
       unit: "Km",
@@ -62,14 +66,14 @@ export const getMetricMetaInfo = (metric) => {
       type: "steppers",
       getIcon() {
         return (
-          <View style={[styles.iconContainer, {backgroundColor:red}]}>
+          <View style={[styles.iconContainer, { backgroundColor: red }]}>
             <MaterialIcons name="directions-run" color={"white"} size={35} />
           </View>
         );
       },
     },
     bike: {
-      id:2,
+      id: 2,
       displayName: "Bike",
       max: 500,
       unit: "km",
@@ -77,14 +81,14 @@ export const getMetricMetaInfo = (metric) => {
       type: "steppers",
       getIcon() {
         return (
-          <View style={[styles.iconContainer, {backgroundColor:orange}]}>
+          <View style={[styles.iconContainer, { backgroundColor: orange }]}>
             <MaterialCommunityIcons name="bike" color={"white"} size={35} />
           </View>
         );
       },
     },
     swim: {
-      id:3,
+      id: 3,
       displayName: "Swim",
       max: 9900,
       unit: "meters",
@@ -92,14 +96,14 @@ export const getMetricMetaInfo = (metric) => {
       type: "steppers",
       getIcon() {
         return (
-          <View style={[styles.iconContainer, {backgroundColor:blue}]}>
+          <View style={[styles.iconContainer, { backgroundColor: blue }]}>
             <MaterialIcons name="pool" color={"white"} size={35} />
           </View>
         );
       },
     },
     sleep: {
-      id:4,
+      id: 4,
       displayName: "Sleep",
       max: 24,
       unit: "hours",
@@ -107,14 +111,14 @@ export const getMetricMetaInfo = (metric) => {
       type: "slider",
       getIcon() {
         return (
-          <View style={[styles.iconContainer, {backgroundColor:lightPurp}]}>
+          <View style={[styles.iconContainer, { backgroundColor: lightPurp }]}>
             <FontAwesome name="bed" color={"white"} size={35} />
           </View>
         );
       },
     },
     eat: {
-      id:5,
+      id: 5,
       displayName: "Eat",
       max: 10,
       unit: "rating",
@@ -122,7 +126,7 @@ export const getMetricMetaInfo = (metric) => {
       type: "slider",
       getIcon() {
         return (
-          <View style={[styles.iconContainer, {backgroundColor:pink}]}>
+          <View style={[styles.iconContainer, { backgroundColor: pink }]}>
             <MaterialCommunityIcons name="food" color={"white"} size={35} />
           </View>
         );
@@ -130,30 +134,79 @@ export const getMetricMetaInfo = (metric) => {
     },
   };
 
-  return  typeof metric === "undefined"
-  ? info 
-  : info[metric];
+  return typeof metric === "undefined" ? info : info[metric];
 };
 
-
-export function getDailyReminderValue (){
-  return{
-    today:"👋 Don't forget to log your data today!"
-  }
-
+export function getDailyReminderValue() {
+  return {
+    today: "👋 Don't forget to log your data today!",
+  };
 }
 
+
+export function clearLocalNotification () {
+  return AsyncStorage.removeItem(NOTIFICATION_KEY)
+    .then(Notifications.cancelAllScheduledNotificationsAsync)
+}
+
+function createNotification () {
+  return {
+    title: 'Log your stats!',
+    body: "👋 don't forget to log your stats for today!",
+    ios: {
+      sound: true,
+    },
+    android: {
+      sound: true,
+      priority: 'high',
+      sticky: false,
+      vibrate: true,
+    }
+  }
+}
+
+export function setLocalNotification () {
+  AsyncStorage.getItem(NOTIFICATION_KEY)
+    .then(JSON.parse)
+    .then((data) => {
+      console.log(data);
+      if (data === null) {
+        Permissions.askAsync(Permissions.NOTIFICATIONS)
+          .then(({ status }) => {
+            console.log({status});
+            if (status === 'granted') {
+              Notifications.cancelAllScheduledNotificationsAsync()
+
+              let tomorrow = new Date()
+              tomorrow.setDate(tomorrow.getDate())
+              tomorrow.setHours(12)
+              tomorrow.setMinutes(34)
+
+              Notifications.scheduleLocalNotificationAsync(
+                createNotification(),
+                {
+                  time: tomorrow,
+                  repeat: 'day',
+                }
+              )
+
+              AsyncStorage.setItem(NOTIFICATION_KEY, JSON.stringify(true))
+            }
+          })
+      }
+    })
+}
 
 // Styles
 
 const styles = StyleSheet.create({
   iconContainer: {
-    padding:5, 
-    borderRadius:8,
-    width:50,
-    height:50,
-    justifyContent:"center",
-    alignItems:"center",
-    marginRight:20,
-  }
-})
+    padding: 5,
+    borderRadius: 8,
+    width: 50,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 20,
+  },
+});

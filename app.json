@@ -1,17 +1,20 @@
 {
-  "name": "FitnessTracker",
-  "displayName": "FitnessTracker",
   "expo": {
+    "sdkVersion": "37.0.0",
+    "orientation": "portrait",
     "name": "FitnessTracker",
-    "slug": "expo-template-bare",
-    "version": "1.0.0",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
-    "assetBundlePatterns": [
-      "**/*"
-    ]
+    "description": "The best triathlon training app in the world.",
+    "slug": "fitnesstracker",
+    "version": "1.0",
+    "icon": "https://img.icons8.com/bubbles/50/000000/exercise.png",
+    "notification": {
+      "icon": "https://img.icons8.com/material-two-tone/24/000000/bookmark-ribbon.png"
+    },
+    "ios": {
+     "bundleIdentifier": "org.udacifitness.exp"
+    },
+    "android": {
+     "package": "org.udacifitness.exp"
+    }
   }
 }

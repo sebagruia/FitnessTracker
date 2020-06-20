@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import {connect} from "react-redux";
 import { View, TouchableOpacity, Text, Platform, StyleSheet } from "react-native";
-import { getMetricMetaInfo, timeToString, getDailyReminderValue  } from "../utils/helpers";
+import { getMetricMetaInfo, timeToString, getDailyReminderValue, clearLocalNotification, setLocalNotification  } from "../utils/helpers";
 import FitnessSlider from "./FitnessSlider";
 import FitnessStepper from "./FitnessStepper";
 import DateHeader from "./DateHeader";
@@ -10,8 +10,11 @@ import TextButton from "./TextButton";
 import {submitEntry, removeEntry } from "../utils/api";
 import {addEntry} from "../redux/actions/index_actions";
 import {white, purple} from "../utils/colors";
+import { set } from "react-native-reanimated";
 
 const SubmitBtn = ({ onPress }) => {
+
+
   return (
     <TouchableOpacity onPress={onPress} style={Platform.OS === 'ios' ? styles.iosSubmitBtn : styles.androidSubmitBtn}>
       <Text style={styles.submitBtnText}>SUBMIT</Text>
@@ -30,7 +33,7 @@ class AddEntry extends Component {
       eat: 0,
     };
   }
-
+  
   increment = (metric) => {
     const { max, step } = getMetricMetaInfo(metric);
     const count = this.state[metric] + step;
@@ -46,6 +49,10 @@ class AddEntry extends Component {
   slide = (metric, value) => {
     this.setState({ [metric]: value });
   };
+
+  toHome = (navigation)=>{
+    navigation.goBack()
+  }
 
   submit = () => {
     const key = timeToString();
@@ -64,11 +71,14 @@ class AddEntry extends Component {
     });
 
     // Navigate to home
+    this.toHome(this.props.navigation);
 
     submitEntry({key, entry});
 
-    // Clear local notofocation
+    clearLocalNotification()
+    .then(setLocalNotification())
   };
+
 
   reset =()=>{
     const key = timeToString();
@@ -80,6 +90,9 @@ class AddEntry extends Component {
     }));
 
     removeEntry(key);
+
+  // Navigate to home
+    this.toHome(this.props.navigation);
   }
 
   render() {
@@ -106,7 +119,6 @@ class AddEntry extends Component {
         <DateHeader date={newDate} />
         {Object.keys(metaInfo).map((key) => {
           const { getIcon, type, id, ...rest } = metaInfo[key];
-          console.log(id);
           const value = this.state[key];
           return (
             <View key={id} style={styles.row}>

@@ -1,4 +1,3 @@
-import "react-native-gesture-handler";
 import React, { Component } from "react";
 import store from "./redux/store";
 import { View, Platform, StatusBar } from "react-native";
@@ -13,12 +12,16 @@ import { purple, white } from "./utils/colors";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import EntryDetail from "./components/EntryDetail";
+import Live from "./components/Live";
+import {setLocalNotification} from "./utils/helpers";
 
 const Tabs = Platform.OS === "ios"
     ? createMaterialBottomTabNavigator()
     : createMaterialTopTabNavigator();
 
-const TabsNavigator = () => {
+const MainNavigator = createStackNavigator();
+
+const Home = () => {
   return (
     <Tabs.Navigator
       tabBarOptions={{
@@ -47,13 +50,21 @@ const TabsNavigator = () => {
       />
       <Tabs.Screen
         name="Add Entry"
-        component={History}
         options={{
           tabBarIcon: ({ tintColor }) => (
             <FontAwesome name="plus-square" size={30} color={tintColor} />
           ),
         }}
         component={AddEntry}
+      />
+      <Tabs.Screen
+        name="Live"
+        component={Live}
+        options={{
+          tabBarIcon: ({ tintColor }) => (
+            <Ionicons name="ios-speedometer" size={30} color={tintColor} />
+          ),
+        }}
       />
     </Tabs.Navigator>
   );
@@ -67,9 +78,14 @@ const CustomStatusbar = ({ backgroundColor, ...props }) => {
   );
 };
 
-const MainNavigator = createStackNavigator();
+
 
 class App extends Component {
+
+componentDidMount (){
+  setLocalNotification();
+}
+
   render() {
     return (
       <Provider store={store}>
@@ -77,7 +93,7 @@ class App extends Component {
           <CustomStatusbar backgroundColor={purple} barStyle="light-content" />
           <NavigationContainer>
             <MainNavigator.Navigator>
-              <MainNavigator.Screen name="Home" component={TabsNavigator} options={{title:"Home", headerShown:false}}/>
+              <MainNavigator.Screen name="Home" component={Home} options={{title:"Home", headerShown:false}}/>
               <MainNavigator.Screen
                 name="EntryDetail"
                 component={EntryDetail}
